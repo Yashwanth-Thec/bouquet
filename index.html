@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>A Bouquet for You</title>
+  <meta name="description" content="A digital bouquet with little memories inside each flower." />
+  <style>
+    /* =======================
+       PREMIUM BOUQUET THEME
+       ======================= */
+    :root{
+      --ink:#241327;
+      --muted:#6a4f72;
+
+      --bg0:#fff7fb;
+      --bg1:#f7f3ff;
+      --bg2:#f2fbff;
+
+      --rose:#ff4fa3;
+      --peach:#ffb3a7;
+      --lav:#a78bff;
+      --mint:#4de2c0;
+      --gold:#ffd27a;
+
+      --paper:#fffaf6;
+      --paper2:#fff1f1;
+
+      --stroke: rgba(36, 19, 39, 0.14);
+      --shadow: 0 22px 70px rgba(36, 19, 39, 0.18);
+      --shadow2: 0 10px 30px rgba(36, 19, 39, 0.12);
+      --glass: rgba(255,255,255,0.62);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1100px 800px at 20% 15%, var(--bg0) 0%, transparent 55%),
+        radial-gradient(900px 700px at 85% 18%, var(--bg1) 0%, transparent 55%),
+        radial-gradient(900px 700px at 55% 90%, var(--bg2) 0%, transparent 55%),
+        linear-gradient(180deg, #fff, #fff);
+      overflow-x:hidden;
+    }
+
+    /* Soft grain */
+    body:before{
+      content:"";
+      position:fixed; inset:0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+      mix-blend-mode:multiply;
+      opacity:.35;
+      pointer-events:none;
+    }
+
+    .wrap{
+      width:min(1100px, 100%);
+      margin:0 auto;
+      padding: 28px 18px 60px;
+      position:relative;
+    }
+
+    /* Floating bokeh/hearts */
+    .floaties{
+      position:fixed; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .flo{
+      position:absolute;
+      width: clamp(14px, 2vw, 22px);
+      aspect-ratio:1/1;
+      border-radius: 999px;
+      filter: blur(0.4px);
+      opacity: .55;
+      animation: drift linear infinite;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+    .flo.heart{
+      width: clamp(12px, 1.8vw, 20px);
+      height: clamp(12px, 1.8vw, 20px);
+      border-radius: 6px;
+      transform: rotate(45deg);
+    }
+    .flo.heart:before,.flo.heart:after{
+      content:"";
+      position:absolute;
+      width:100%; height:100%;
+      border-radius: 999px;
+      background:inherit;
+      top:-50%;
+      left:0;
+    }
+    .flo.heart:after{ left:-50%; top:0; }
+
+    @keyframes drift{
+      from{ transform: translateY(110vh) translateX(0) rotate(0deg); }
+      to{ transform: translateY(-140px) translateX(60px) rotate(80deg); }
+    }
+
+    /* Header */
+    header{
+      text-align:center;
+      padding: 24px 10px 8px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 8px 12px;
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow2);
+      font-weight: 750;
+      color: rgba(36,19,39,0.78);
+      letter-spacing:.2px;
+      font-size: 12px;
+    }
+    h1{
+      margin: 16px 0 6px;
+      font-size: clamp(34px, 4.2vw, 58px);
+      letter-spacing: -0.6px;
+      line-height: 1.05;
+    }
+    .sub{
+      margin: 0 auto;
+      max-width: 70ch;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    /* Main layout */
+    .grid{
+      margin-top: 26px;
+      display:grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    @media (min-width: 980px){
+      .grid{
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 22px;
+      }
+    }
+
+    /* Bouquet Card */
+    .card{
+      border: 1px solid var(--stroke);
+      border-radius: 28px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .bouquetStage{
+      position:relative;
+      min-height: 560px;
+      padding: 22px 18px 18px;
+    }
+    @media (max-width: 420px){
+      .bouquetStage{ min-height: 520px; }
+    }
+
+    /* A subtle spotlight */
+    .bouquetStage:before{
+      content:"";
+      position:absolute; inset:-40px -40px auto -40px;
+      height: 340px;
+      background:
+        radial-gradient(closest-side at 45% 70%, rgba(255,79,163,0.18), transparent 68%),
+        radial-gradient(closest-side at 68% 55%, rgba(167,139,255,0.16), transparent 70%),
+        radial-gradient(closest-side at 30% 45%, rgba(77,226,192,0.14), transparent 70%);
+      pointer-events:none;
+      filter: blur(1px);
+    }
+
+    /* Bouquet wrap (paper) */
+    .wrapPaper{
+      position:absolute;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      width: min(560px, 94%);
+      height: 340px;
+      pointer-events:none;
+    }
+    .paperBack, .paperFront{
+      position:absolute; inset:auto 0 0 0;
+      height: 280px;
+      border-radius: 30px;
+      border: 1px solid var(--stroke);
+      box-shadow: 0 22px 60px rgba(36,19,39,0.14);
+      background:
+        radial-gradient(900px 400px at 30% 10%, rgba(255,79,163,0.10), transparent 55%),
+        radial-gradient(900px 400px at 80% 15%, rgba(167,139,255,0.10), transparent 55%),
+        linear-gradient(180deg, var(--paper), var(--paper2));
+      clip-path: polygon(50% 0%, 96% 18%, 100% 100%, 0% 100%, 4% 18%);
+    }
+    .paperFront{
+      height: 250px;
+      bottom: -6px;
+      opacity:.98;
+      background:
+        radial-gradient(900px 400px at 55% 10%, rgba(255,210,122,0.12), transparent 55%),
+        linear-gradient(180deg, #fff, #fff2f8);
+      clip-path: polygon(50% 10%, 92% 30%, 100% 100%, 0% 100%, 8% 30%);
+      transform: rotate(0.6deg);
+    }
+
+    /* Ribbon */
+    .ribbon{
+      position:absolute;
+      left:50%;
+      bottom: 72px;
+      transform: translateX(-50%);
+      width: min(220px, 70%);
+      height: 64px;
+      pointer-events:none;
+      filter: drop-shadow(0 18px 26px rgba(36,19,39,0.18));
+    }
+    .ribbon .knot{
+      position:absolute; left:50%; top:50%;
+      transform: translate(-50%,-50%);
+      width: 64px; height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,79,163,0.95), rgba(167,139,255,0.9));
+      border: 1px solid rgba(255,255,255,0.55);
+    }
+    .ribbon .tail{
+      position:absolute; top:50%;
+      width: 92px; height: 30px;
+      background: linear-gradient(135deg, rgba(255,79,163,0.9), rgba(255,179,167,0.9));
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 14px;
+    }
+    .ribbon .tail.left{
+      left: 8px;
+      transform: translateY(-50%) rotate(-12deg);
+      clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%, 10% 50%);
+    }
+    .ribbon .tail.right{
+      right: 8px;
+      transform: translateY(-50%) rotate(12deg);
+      background: linear-gradient(135deg, rgba(167,139,255,0.9), rgba(255,79,163,0.86));
+      clip-path: polygon(0 10%, 100% 0, 90% 50%, 100% 100%, 0 90%);
+    }
+
+    /* Stems */
+    .stems{
+      position:absolute;
+      left:50%;
+      bottom: 120px;
+      transform: translateX(-50%);
+      width: min(520px, 92%);
+      height: 260px;
+      pointer-events:none;
+      opacity:.95;
+    }
+    .stem{
+      position:absolute;
+      bottom: 0;
+      width: 10px;
+      height: 250px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(40,160,110,0.0), rgba(40,160,110,0.85));
+      filter: drop-shadow(0 12px 16px rgba(0,0,0,0.10));
+      transform-origin: bottom center;
+    }
+    .stem:after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top: 36%;
+      width: 34px;
+      height: 18px;
+      transform: translateX(-50%) rotate(-18deg);
+      border-radius: 999px;
+      background: radial-gradient(circle at 35% 50%, rgba(77,226,192,0.7), rgba(40,160,110,0.85));
+      opacity:.55;
+      filter: blur(0.2px);
+    }
+
+    /* Flowers as premium buttons */
+    .flowers{
+      position:absolute;
+      left:50%;
+      bottom: 210px;
+      transform: translateX(-50%);
+      width: min(680px, 100%);
+      height: 360px;
+    }
+
+    .flowerBtn{
+      position:absolute;
+      width: 108px;
+      height: 108px;
+      border:0;
+      padding:0;
+      cursor:pointer;
+      background: transparent;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 18px 22px rgba(36,19,39,0.16));
+      transition: transform .18s ease, filter .18s ease;
+      outline: none;
+    }
+    .flowerBtn:hover{
+      transform: translate(-50%, -52%) scale(1.04);
+      filter: drop-shadow(0 24px 26px rgba(36,19,39,0.22));
+    }
+    .flowerBtn:active{
+      transform: translate(-50%, -50%) scale(0.98);
+    }
+
+    /* Flower SVG parts */
+    .petals{
+      transform-origin: 50% 50%;
+      animation: bloom 6.5s ease-in-out infinite;
+    }
+    .flowerBtn:nth-child(odd) .petals{ animation-duration: 7.8s; }
+    .flowerBtn:nth-child(3n) .petals{ animation-duration: 8.6s; }
+    @keyframes bloom{
+      0%,100%{ transform: rotate(-2deg) scale(1); }
+      50%{ transform: rotate(2deg) scale(1.03); }
+    }
+    .glow{
+      animation: glow 5.8s ease-in-out infinite;
+      transform-origin: 50% 50%;
+    }
+    @keyframes glow{
+      0%,100%{ opacity:.55; transform: scale(1); }
+      50%{ opacity:.85; transform: scale(1.08); }
+    }
+
+    /* Side panel */
+    .side{
+      padding: 18px 18px 20px;
+    }
+    .side h2{
+      margin: 6px 0 8px;
+      font-size: 20px;
+      letter-spacing:-0.2px;
+    }
+    .note{
+      color: var(--muted);
+      line-height:1.55;
+      font-size: 14px;
+      margin: 0 0 14px;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top: 10px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow2);
+      font-weight: 750;
+      font-size: 12px;
+      color: rgba(36,19,39,0.75);
+    }
+    .chip .dot{
+      width:10px; height:10px;
+      border-radius:999px;
+      background: linear-gradient(135deg, var(--rose), var(--lav));
+    }
+
+    .cta{
+      margin-top: 14px;
+      border-top: 1px solid var(--stroke);
+      padding-top: 14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 11px 12px;
+      cursor:pointer;
+      font-weight: 850;
+      letter-spacing:.2px;
+      box-shadow: var(--shadow2);
+      transition: transform .14s ease, box-shadow .14s ease;
+      color: rgba(36,19,39,0.82);
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 16px 36px rgba(36,19,39,0.14); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(255,79,163,0.92), rgba(167,139,255,0.88));
+      border: 1px solid rgba(255,255,255,0.40);
+      color:white;
+    }
+
+    /* Modal (glass) */
+    .overlay{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 22px;
+      background: rgba(20, 8, 24, 0.55);
+      backdrop-filter: blur(6px);
+      z-index: 50;
+    }
+    .overlay.show{ display:flex; }
+
+    .modal{
+      width: min(920px, 100%);
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.70);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 26px 90px rgba(0,0,0,0.26);
+      overflow:hidden;
+      transform: translateY(8px) scale(0.99);
+      animation: pop .18s ease forwards;
+    }
+    @keyframes pop{
+      to{ transform: translateY(0) scale(1); }
+    }
+
+    .modalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(36,19,39,0.12);
+      background:
+        radial-gradient(700px 220px at 20% 20%, rgba(255,79,163,0.18), transparent 55%),
+        radial-gradient(700px 220px at 80% 15%, rgba(167,139,255,0.18), transparent 55%),
+        rgba(255,255,255,0.55);
+    }
+    .modalTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight: 950;
+      letter-spacing: -0.2px;
+    }
+    .badge{
+      display:inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: linear-gradient(135deg, rgba(255,79,163,0.90), rgba(167,139,255,0.85));
+      color:white;
+      font-weight: 900;
+      font-size: 12px;
+      box-shadow: 0 14px 30px rgba(36,19,39,0.16);
+    }
+    .close{
+      border: 1px solid rgba(36,19,39,0.14);
+      background: rgba(255,255,255,0.72);
+      border-radius: 16px;
+      padding: 9px 12px;
+      cursor:pointer;
+      font-weight: 900;
+      box-shadow: 0 12px 26px rgba(36,19,39,0.12);
+    }
+
+    .modalBody{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 16px;
+    }
+    @media (min-width: 900px){
+      .modalBody{ grid-template-columns: 1.1fr 0.9fr; }
+    }
+
+    .photo{
+      width:100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: 22px;
+      border: 1px solid rgba(36,19,39,0.14);
+      background: rgba(255,255,255,0.55);
+      box-shadow: 0 18px 50px rgba(36,19,39,0.14);
+    }
+    .msg{
+      border: 1px solid rgba(36,19,39,0.12);
+      border-radius: 22px;
+      padding: 14px 14px 16px;
+      background: rgba(255,255,255,0.60);
+      box-shadow: 0 18px 50px rgba(36,19,39,0.12);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height: 100%;
+    }
+    .msg p{
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(36,19,39,0.90);
+      white-space: pre-wrap;
+    }
+    .msg .meta{
+      margin-top: 12px;
+      color: rgba(36,19,39,0.55);
+      font-size: 12px;
+      font-weight: 750;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .tiny{
+      margin-top: 10px;
+      color: rgba(36,19,39,0.55);
+      font-size: 12px;
+      text-align:center;
+    }
+
+    /* Reduced motion respect */
+    @media (prefers-reduced-motion: reduce){
+      .petals,.glow,.flo{ animation: none !important; }
+      .flowerBtn:hover{ transform: translate(-50%,-50%); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="floaties" id="floaties" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="eyebrow"> A bouquet, but forever</div>
+      <h1>For My Baby, The One I Will Always Love.</h1>
+      <p class="sub">Click any flower to open a little memory, a photo of you and a note I mean with my whole heart.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Bouquet -->
+      <section class="card">
+        <div class="bouquetStage" id="stage">
+          <!-- stems -->
+          <div class="stems" id="stems"></div>
+
+          <!-- flowers -->
+          <div class="flowers" id="flowers"></div>
+
+          <!-- paper + ribbon -->
+          <div class="wrapPaper" aria-hidden="true">
+            <div class="paperBack"></div>
+            <div class="paperFront"></div>
+
+            <div class="ribbon">
+              <div class="tail left"></div>
+              <div class="tail right"></div>
+              <div class="knot"></div>
+            </div>
+          </div>
+
+          <div class="tiny">Tip: press <b>Esc</b> to close a flower ✨</div>
+        </div>
+      </section>
+
+      <!-- Side panel -->
+      <aside class="card side">
+        <h2>How this works</h2>
+        <p class="note">
+          +
+        </p>
+
+        <div class="chips">
+          <div class="chip"><span class="dot"></span> My love</div>
+          <div class="chip"><span class="dot"></span> My life</div>
+          <div class="chip"><span class="dot"></span> My Everything</div>
+        </div>
+
+        <div class="cta">
+          <button class="btn primary" id="openRandom">Open a random flower 🌸</button>
+          <button class="btn" id="rearrange">Rearrange bouquet ✨</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalTop">
+        <div class="modalTitle" id="modalTitle">
+          <span class="badge" id="badge">Flower</span>
+          <span id="flowerName">—</span>
+        </div>
+        <button class="close" id="closeBtn">Close ✕</button>
+      </div>
+
+      <div class="modalBody">
+        <img class="photo" id="photo" src="" alt="Photo" />
+        <div class="msg">
+          <p id="message"></p>
+          <div class="meta">
+            <span id="tagline">Picked with love.</span>
+            <span id="date"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================
+    // 1) EDIT THESE FLOWERS
+    // ==========================
+    // Put your photos in /photos and match filenames here.
+    const FLOWERS = [
+      { name: "Rose",    colorA: "#ff4fa3", colorB: "#ffb3a7", img: "Image.jpg", msg: "How can one look this beautiful.\n To look this pretty even whole frowing,\n is this unbelievable.\n I love you every reaction.\n The cuteness you bring forth in my life\n is something I will forever cherish in my heart.\n I love you bangaram." },
+      { name: "Tulip",   colorA: "#a78bff", colorB: "#ff4fa3", img: "img.jpg", msg: "This is expression that welcomes me to every call.\n This is the expression I instantly snapshot.\n Not because I find it funny.\n But because of the fact that my baby put herself in a vulnerable position,\n just to make me smile.\n But bangaram I reality is that you dont have to do anything to make me smile\n. Looking at you instanly and unknowlingly brings a smile to my face\n. You are the definition of warth, home, and love\n  captured in a body. I love you sooo sooooooo muchhhh bangarammm." },
+      { name: "Sakura",  colorA: "#ffb3a7", colorB: "#ffd27a", img: "img1.jpg", msg: "In every mirror picture your eyes may not be looking up./n But they are what I am draw to.\n The beauty you carry in thoese bubbly eyes of yours is truly just unmatched.\n The sparkle they, make it look like you eyes can smile./n Your eyes carry more emotion than any words can./n I can't stop looking at them.\n I can't help but to get lost in them.\n Your eyes are like the storm in the ocean,\n a sotrm of choas,\n the kind that makes me feel at peace.\n Your eyes carry the weight of a million words.\n Words waiting to be discovered.\n Words that desicribe the most beautiful person in this universe.\n You are the love of my life bangaram,\n not just for this lifetime but for the many more to come,\n I will always search for your eyes." },
+      { name: "Daisy",   colorA: "#ffd27a", colorB: "#4de2c0", img: "img3.jpg", msg: "I can never get enough.\n I can never manage to get enough of you.\n I can never stop looking at you.\n I can never manage to take my eyes off you.\n In this image even though there appears to be 2 of yourself.\n I still want more.\n There could be a million you,\n but I still wouldn't be able to get enough of you.\n Even with those million yous the only you I want is you,\n the you that lover so dearly,\n the you that makes me feel so loved,\n the you that is there to support me, \n the you that I adore.\n I want that you.\n I want only you.\n In this entire universe I know I am the luckiest guy.\n I am lucky to have you in my life.\n I am lucky to call you mine.\n I am lucky to have you as the love of my life.\n My love for you has no bounds,\n I love you with all my heart." },
+      { name: "Lavender",colorA: "#a78bff", colorB: "#4de2c0", img: "IMG_0770.PNG", msg: "Watching you sleep has to be the most magical heartwarming thing ever.\n Watching you sleep, I imagine my future.\n A future with you.\n A future so bright that no darkness can ever dim it even a bit.\n A future full of life.\n A future filled with love.\n A future filled with adventure.\n A future where nothing can take us apart.\n A future where I know I can achive anything, only becuase I have you by my side.\n A future with you is all I want.\n Many things can change in this future I imagine to have.\n There are many uncertinties to my hope.\n I may face many setbacks.\n But I know one thing for sure.\n I know I can rise over ever setback with the support you give me.\n I know I may not be able to account for all the uncertinites that we may face,\n but I know there's on thing in this world that will not change. My ever growing love for you is something that can never be changed baby." },
+      { name: "Hibiscus",colorA: "#ff4fa3", colorB: "#a78bff", img: "IMG_7155.JPG", msg: "Aap se sundhar iss dhuniya mai koi nahi hai.\n Aap mere jeevan ka aarth ho.\n Mujko kuch ho ya na ho sirf ek cheez chahiya. Kyunki kevel iss ek cheez mera jeevan me andhera hathadengee. Aap koi cheez nahi ho,\n Aap mere dill ho,\n Aap mere saas ho,\n Aap mere sarvasva ho.\n Mujhe maaf kardhijiye mai aap ko cheez bola,\n par aap koi cheez nahi ho par mujhko aur shabd nahi pata hai.\n Mere thukdi hindi ko bhi maaf kardijiye.\n Mai aap se bahut bahut pyaar karata hu.\n Mujhko sirf aap hi aap chaahiye." }
+    ];
+
+    // ==========================
+    // 2) Bouquet placement presets
+    // ==========================
+    // These are tuned so it looks like a real bouquet cluster.
+    const PRESETS = [
+      // x%, y% positions relative to the bouquet area
+      [
+        {x:50, y:18, s:1.12, r:-6},
+        {x:33, y:28, s:0.98, r:10},
+        {x:68, y:30, s:1.02, r:-10},
+        {x:24, y:44, s:0.92, r:6},
+        {x:76, y:46, s:0.94, r:-2},
+        {x:50, y:52, s:0.90, r:3}
+      ],
+      [
+        {x:50, y:20, s:1.08, r:4},
+        {x:30, y:30, s:0.96, r:-8},
+        {x:70, y:32, s:1.03, r:12},
+        {x:26, y:48, s:0.92, r:-2},
+        {x:78, y:48, s:0.92, r:4},
+        {x:50, y:55, s:0.88, r:-4}
+      ]
+    ];
+
+    const floaties = document.getElementById("floaties");
+    const stemsEl = document.getElementById("stems");
+    const flowersEl = document.getElementById("flowers");
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("closeBtn");
+    const openRandomBtn = document.getElementById("openRandom");
+    const rearrangeBtn = document.getElementById("rearrange");
+
+    const badge = document.getElementById("badge");
+    const flowerName = document.getElementById("flowerName");
+    const photo = document.getElementById("photo");
+    const message = document.getElementById("message");
+    const dateEl = document.getElementById("date");
+
+    // Create floaties (bokeh + hearts)
+    (function makeFloaties(){
+      const colors = ["rgba(255,79,163,0.55)","rgba(167,139,255,0.52)","rgba(77,226,192,0.45)","rgba(255,210,122,0.45)"];
+      const count = 18;
+      for(let i=0;i<count;i++){
+        const d = document.createElement("div");
+        const isHeart = Math.random() < 0.28;
+        d.className = "flo" + (isHeart ? " heart" : "");
+        d.style.left = (Math.random()*100) + "vw";
+        d.style.background = colors[(Math.random()*colors.length)|0];
+        d.style.animationDuration = (12 + Math.random()*16) + "s";
+        d.style.animationDelay = (-Math.random()*18) + "s";
+        d.style.opacity = (0.35 + Math.random()*0.35).toFixed(2);
+        d.style.transform = `translateY(${110 + Math.random()*30}vh)`;
+        floaties.appendChild(d);
+      }
+    })();
+
+    function flowerSVG(colorA, colorB){
+      // A layered flower with soft gradients (premium look)
+      const id = "g" + Math.random().toString(16).slice(2);
+      return `
+      <svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">
+        <defs>
+          <radialGradient id="${id}" cx="40%" cy="35%" r="70%">
+            <stop offset="0%" stop-color="${colorA}" stop-opacity="0.95"/>
+            <stop offset="70%" stop-color="${colorB}" stop-opacity="0.88"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.25"/>
+          </radialGradient>
+          <radialGradient id="${id}-c" cx="45%" cy="45%" r="60%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
+            <stop offset="55%" stop-color="rgba(255,210,122,0.95)"/>
+            <stop offset="100%" stop-color="rgba(255,79,163,0.55)"/>
+          </radialGradient>
+        </defs>
+
+        <!-- glow -->
+        <circle class="glow" cx="60" cy="60" r="44" fill="rgba(255,255,255,0.20)"></circle>
+
+        <!-- petals -->
+        <g class="petals">
+          ${Array.from({length:10}).map((_,i)=>{
+            const a = i*(360/10);
+            return `<ellipse cx="60" cy="32" rx="18" ry="26" fill="url(#${id})" transform="rotate(${a} 60 60)"></ellipse>`;
+          }).join("")}
+        </g>
+
+        <!-- center -->
+        <circle cx="60" cy="60" r="16" fill="url(#${id}-c)" opacity="0.98"></circle>
+        <circle cx="60" cy="60" r="7" fill="rgba(36,19,39,0.16)"></circle>
+        <circle cx="57" cy="57" r="3.2" fill="rgba(255,255,255,0.85)"></circle>
+      </svg>`;
+    }
+
+    function openModal(f){
+      badge.textContent = "💌 Note";
+      flowerName.textContent = f.name;
+      photo.src = f.img;
+      photo.alt = `${f.name} photo`;
+      message.textContent = f.msg;
+
+      const now = new Date();
+      dateEl.textContent = now.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
+
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden","false");
+    }
+
+    function closeModal(){
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden","true");
+      photo.src = "";
+    }
+
+    function buildBouquet(presetIndex = 0){
+      flowersEl.innerHTML = "";
+      stemsEl.innerHTML = "";
+
+      const preset = PRESETS[presetIndex % PRESETS.length];
+
+      FLOWERS.forEach((f, i) => {
+        const pos = preset[i] || {x: 20 + i*10, y: 30 + i*6, s: 0.95, r: 0};
+
+        // stem
+        const stem = document.createElement("div");
+        stem.className = "stem";
+        // align stem under flower
+        const stemLeft = pos.x;
+        const stemAngle = (pos.x - 50) * 0.35; // fan outward
+        stem.style.left = `calc(${stemLeft}% - 5px)`;
+        stem.style.transform = `rotate(${stemAngle}deg)`;
+        stem.style.height = `${230 + (Math.random()*30)}px`;
+        stemsEl.appendChild(stem);
+
+        // flower button
+        const btn = document.createElement("button");
+        btn.className = "flowerBtn";
+        btn.type = "button";
+        btn.style.left = pos.x + "%";
+        btn.style.top  = pos.y + "%";
+        btn.style.transform = `translate(-50%,-50%) rotate(${pos.r}deg) scale(${pos.s})`;
+
+        btn.innerHTML = flowerSVG(f.colorA, f.colorB);
+        btn.addEventListener("click", () => openModal(f));
+
+        flowersEl.appendChild(btn);
+      });
+    }
+
+    // initial build
+    let presetIndex = 0;
+    buildBouquet(presetIndex);
+
+    rearrangeBtn.addEventListener("click", () => {
+      presetIndex = (presetIndex + 1) % PRESETS.length;
+      buildBouquet(presetIndex);
+    });
+
+    openRandomBtn.addEventListener("click", () => {
+      const f = FLOWERS[(Math.random()*FLOWERS.length)|0];
+      openModal(f);
+    });
+
+    closeBtn.addEventListener("click", closeModal);
+    overlay.addEventListener("click", (e) => { if(e.target === overlay) closeModal(); });
+    window.addEventListener("keydown", (e) => { if(e.key === "Escape") closeModal(); });
+
+    // Small parallax tilt on mouse move (premium feel)
+    const stage = document.getElementById("stage");
+    stage.addEventListener("mousemove", (e) => {
+      const r = stage.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      stage.style.transform = `perspective(900px) rotateY(${x*4}deg) rotateX(${(-y)*3}deg)`;
+    });
+    stage.addEventListener("mouseleave", () => {
+      stage.style.transform = `none`;
+    });
+  </script>
+</body>
+</html>
